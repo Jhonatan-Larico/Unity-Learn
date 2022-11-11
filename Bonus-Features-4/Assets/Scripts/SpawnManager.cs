@@ -5,8 +5,8 @@ using UnityEngine;
 public class SpawnManager : MonoBehaviour
 {   
     public GameObject enemyPrefab;
-    public GameObject powerupPrefab;
-    public GameObject powerIconPrefab;
+    public GameObject[] powerups;
+
     public GameObject[] superEnemies;
 
     private float spwanRange =9.0f;
@@ -16,39 +16,54 @@ public class SpawnManager : MonoBehaviour
     private float timeToSawnSuperEnemies = 5.0f;
     private float time = 0;
 
+    GameObject powerup;
+    GameObject powerup2;
+
+
+
     // Start is called before the first frame update
     void Start()
     {
         SpawnEnemies(waveNumber);
-        Instantiate(powerupPrefab, GenerateSpawPosition(), powerupPrefab.transform.rotation);
     }
 
     // Update is called once per frame
     void Update()
     {
+        int randomPowerup = Random.Range(0, powerups.Length);
         enemyCount = FindObjectsOfType<Enemy>().Length;
+
         if(enemyCount == 0) {
             waveNumber++;
             SpawnEnemies(waveNumber); 
-            Instantiate(powerupPrefab,GenerateSpawPosition(),powerupPrefab.transform.rotation);
+            powerup =  Instantiate(powerups[randomPowerup], GenerateSpawPosition(), powerups[randomPowerup].transform.rotation);
+            StartCoroutine(destroyPowerIcon(powerup) );
         }
 
-        //Spawn an superEnemy every 5 seconds
+        //Spawn an superEnemy every 5 seconds and  powerup
         time += Time.deltaTime;
         if (time > timeToSawnSuperEnemies) {
             SpawnSuperEnemies();
-            Instantiate(powerIconPrefab, GenerateSpawPosition(), powerIconPrefab.transform.rotation);
-
+            powerup2 = Instantiate(powerups[randomPowerup], GenerateSpawPosition(), powerups[randomPowerup].transform.rotation);
+            StartCoroutine(destroyPowerIcon(powerup2));
             time = 0;
         }
 
-        
+
     }
+    //Destroy power icon after 5s
+    IEnumerator destroyPowerIcon(GameObject obj)
+    {
+        yield return new WaitForSeconds(5);
+        Destroy(obj);
+    }
+
     void SpawnEnemies(int enemisToSpawn)
     {
         for(int i = 0; i < enemisToSpawn; i++)
         {
             Instantiate(enemyPrefab, GenerateSpawPosition(), enemyPrefab.transform.rotation);
+
         }
     }
 

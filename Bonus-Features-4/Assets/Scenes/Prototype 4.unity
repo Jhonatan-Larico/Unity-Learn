@@ -624,8 +624,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemyPrefab: {fileID: 3056758559585456712, guid: aab4c6bf1a7ea3e43804e0ae68bfd37e, type: 3}
-  powerupPrefab: {fileID: 7066221168430250205, guid: 56b0523d4297579458dc579893570b35, type: 3}
-  powerIconPrefab: {fileID: 8885288752119061270, guid: 52496dbfefba9824eacfd6ba6dee3f92, type: 3}
+  powerups:
+  - {fileID: 7066221168430250205, guid: 56b0523d4297579458dc579893570b35, type: 3}
+  - {fileID: 8885288752119061270, guid: 52496dbfefba9824eacfd6ba6dee3f92, type: 3}
+  - {fileID: 2142069556615848952, guid: c1aae086afe7ce444a89e816b14999d3, type: 3}
   superEnemies:
   - {fileID: 3111292591842563861, guid: 472f31ce8a656bd4ba0d94df22bbcce8, type: 3}
   - {fileID: 2142477124016090578, guid: 78862efcce5aad940b96d352c2730e8c, type: 3}
@@ -675,7 +677,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1716465544}
   serializedVersion: 2
-  m_Mass: 2
+  m_Mass: 3
   m_Drag: 0
   m_AngularDrag: 0.05
   m_UseGravity: 1
@@ -776,7 +778,13 @@ MonoBehaviour:
   bullet: {fileID: 4563914247371721539, guid: cefde58d386390740bc42b9e6a3c2f62, type: 3}
   powerupIndicator: {fileID: 233862863}
   speed: 3
-  powerupStrength: 15
+  powerupStrength: 40
+  powerForce: 50
+  radius: 30
+  upForce: -0.6
+  hasJump: 0
+  jumpForce: 35
+  downForce: 80
 --- !u!1001 &7305732181041295649
 PrefabInstance:
   m_ObjectHideFlags: 0

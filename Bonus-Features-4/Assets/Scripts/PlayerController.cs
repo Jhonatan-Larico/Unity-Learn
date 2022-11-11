@@ -15,11 +15,22 @@ public class PlayerController : MonoBehaviour
     public GameObject powerupIndicator;
 
     public float speed = 5.0f;
+    //Powerups
     private bool hasPowerup = false;
-    private bool hasPowerIcon = false;
+    private bool hasPowerup2 = false;
+    private bool hasPowerup3 = false;
     public float powerupStrength = 15.0f;
 
-    // Start is called before the first frame update
+    // Variables involved in AddExplosionForce
+    public float powerForce = 10.0f;
+    public float radius = 5.0f;
+    public float upForce = 1.0f;
+
+    private bool isOnGround ;
+    public bool hasJump;
+    public float jumpForce = 25.0f;
+    public float downForce = 20.0f;
+
     void Start()
     {
         playerRb = GetComponent<Rigidbody>();
@@ -40,34 +51,43 @@ public class PlayerController : MonoBehaviour
         Smashattack();
     }
 
-
+    // Detect collision with powerups
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Powerup") && !hasPowerIcon)
+        if (other.CompareTag("Powerup-1") && !hasPowerup2 && !hasPowerup3)
         {
             hasPowerup = true;
             powerupIndicator.SetActive(true);
             Destroy(other.gameObject);
             StartCoroutine(PowerupCountdownRoutine());
         }
-        if (other.CompareTag("PowerIcon") & !hasPowerup)
+        if (other.CompareTag("Powerup-2") & !hasPowerup && !hasPowerup3)
         {
-            hasPowerIcon = true;
+            hasPowerup2 = true;
             powerupIndicator.SetActive(true);
             Destroy(other.gameObject);
             StartCoroutine(PowerupCountdownRoutine());
         }
-
+        if (other.CompareTag("Powerup-3") && !hasPowerup && !hasPowerup2 )
+        {   
+            hasPowerup3 = true;
+            powerupIndicator.SetActive(true);
+            Destroy(other.gameObject);
+            StartCoroutine(PowerupCountdownRoutine());
+        }
     }
 
+    // Wait x seconds for deactivate the powerups
     IEnumerator PowerupCountdownRoutine()
     {
         yield return new WaitForSeconds(7);
         hasPowerup = false;
-        hasPowerIcon = false;
+        hasPowerup2 = false;
+        hasPowerup3 = false;
         powerupIndicator.SetActive(false);
     }
 
+    // Powerup1, hit balls adding an extra force
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.CompareTag("Enemy") && hasPowerup)
@@ -78,16 +98,20 @@ public class PlayerController : MonoBehaviour
             enemyRb.AddForce(awayFromPlayer * powerupStrength, ForceMode.Impulse);
 
         }
+        if (collision.gameObject.CompareTag("Ground"))
+        {
+            isOnGround = true;
+        }
+
     }
 
+    // Powerup2, bullets are spawn against the enemies
     private void OnPowerUpBullets()
     {
-
-        if (Input.GetKeyDown(KeyCode.Space) && hasPowerIcon)
+        if (Input.GetKeyDown(KeyCode.Space) && hasPowerup2)
         {
             StartCoroutine(OnPowerUpBulletsCoroutine());
         }
-
     }
     IEnumerator OnPowerUpBulletsCoroutine()
     {
@@ -115,20 +139,41 @@ public class PlayerController : MonoBehaviour
 
             yield return wait; //Pause the loop for 0.1 seconds.
 
-
-
         }
-        hasPowerIcon = false;
 
     }
 
-
+    //Powerup3, ExplosionForce
     private void Smashattack()
-    {
-        if (Input.GetKeyDown(KeyCode.R))
+    {   
+        // Force push to the ground
+        if (playerRb.velocity.y < 0f && !isOnGround)
         {
-            playerRb.AddForce(Vector3.up *20, ForceMode.Impulse);
-            //Todo
+            playerRb.AddForce(Vector3.down * downForce, ForceMode.Force);       
+        }
+
+        if (Input.GetKeyDown(KeyCode.R)  && isOnGround && hasPowerup3 )
+        {               
+            playerRb.AddForce(Vector3.up*jumpForce,ForceMode.Impulse);              
+            
+            isOnGround = false;
+            hasJump = true;
+        }
+
+        if (isOnGround && hasJump)
+        {
+            Vector3 explosionForcePosition = transform.position;
+            Collider[] colliders = Physics.OverlapSphere(explosionForcePosition, radius);
+            foreach (var enemy in colliders)
+            {
+                Rigidbody enemyRb = enemy.GetComponent<Rigidbody>();
+                if (enemyRb != null)
+                {
+                    enemyRb.AddExplosionForce(powerForce, explosionForcePosition, radius, upForce, ForceMode.Impulse);
+                }
+
+            }
+            hasJump = false;
         }
     }
 }

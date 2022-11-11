@@ -9,6 +9,9 @@ TagManager:
   - SuperEnemy
   - PowerIcon
   - Ground
+  - Powerup-1
+  - Powerup-2
+  - Powerup-3
   layers:
   - Default
   - TransparentFX
